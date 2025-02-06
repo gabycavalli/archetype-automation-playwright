@@ -1,0 +1,425 @@
+# =============================
+# Set BrowserStack Credentials
+# =============================
+# Add your BrowserStack userName and accessKey here or set BROWSERSTACK_USERNAME and
+# BROWSERSTACK_ACCESS_KEY as env variables
+userName: browserautomate_g0xkya
+accessKey: vZNzov3GRYqyT7DsD792
+
+# ======================
+# BrowserStack Reporting
+# ======================
+# The following capabilities are used to set up reporting on BrowserStack:
+# Set 'projectName' to the name of your project. Example, Marketing Website
+projectName: Playwright
+# Set `buildName` as the name of the job / testsuite being run
+buildName: Playwright-e2e build
+# `buildIdentifier` is a unique id to differentiate every execution that gets appended to
+# buildName. Choose your buildIdentifier format from the available expressions:
+# ${BUILD_NUMBER} (Default): Generates an incremental counter with every execution
+# ${DATE_TIME}: Generates a Timestamp with every execution. Eg. 05-Nov-19:30
+# Read more about buildIdentifiers here -> https://www.browserstack.com/docs/automate/selenium/organize-tests
+buildIdentifier: '#${BUILD_NUMBER}' # Supports strings along with either/both ${expression}
+
+# =======================================
+# Platforms (Browsers / Devices to test)
+# =======================================
+# Platforms object contains all the browser / device combinations you want to test on.
+# Entire list available here -> (https://www.browserstack.com/list-of-browsers-and-platforms/automate)
+platforms:
+  - os: OS X
+    osVersion: Ventura
+    browserName: playwright-webkit
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: osXVentura
+  - deviceName: Samsung Galaxy Note 20
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyNote20
+  - deviceName: Samsung Galaxy S8
+    browserName: chrome
+    osVersion: 7.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS8
+  - deviceName: Samsung Galaxy S9
+    browserName: chrome
+    osVersion: 8.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS9
+  - deviceName: Samsung Galaxy Note 9
+    browserName: chrome
+    osVersion: 8.1
+    playwrightConfigOptions:
+      name: SamsungGalaxyNote9
+  - deviceName: Samsung Galaxy A10
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyA10
+  - deviceName: Samsung Galaxy A51
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyA51
+  - deviceName: Samsung Galaxy A52
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyA52
+  - deviceName: Samsung Galaxy A11
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyA11
+  - deviceName: Samsung Galaxy M32
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyM32
+  - deviceName: Samsung Galaxy S20
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS20
+  - deviceName: Samsung Galaxy S10
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS10
+  - deviceName: Samsung Galaxy S20 Plus
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS20Plus
+  - deviceName: Samsung Galaxy S20 Ultra
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS20Ultra
+  - deviceName: Samsung Galaxy S21
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS21
+  - deviceName: Samsung Galaxy S21
+    browserName: chrome
+    osVersion: 12.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS21_12_0
+  - deviceName: Samsung Galaxy S21 Plus
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS21Plus
+  - deviceName: Samsung Galaxy S21 Ultra
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS21Ultra
+  - deviceName: Samsung Galaxy S22
+    browserName: chrome
+    osVersion: 12.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS22
+  - deviceName: Samsung Galaxy S23 Ultra
+    browserName: chrome
+    osVersion: 13.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS23Ultra
+  - deviceName: Samsung Galaxy Note 10
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyNote10
+  - deviceName: Samsung Galaxy M52
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyM52
+  - deviceName: Samsung Galaxy Note 20 Ultra
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyNote20Ultra
+  - deviceName: Samsung Galaxy S24
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS24
+  - deviceName: Samsung Galaxy S24 Ultra
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: SamsungGalaxyS24Ultra
+  - deviceName: Google Pixel 5
+    browserName: chrome
+    osVersion: 12.0
+    playwrightConfigOptions:
+      name: GooglePixel5_12_0
+  - deviceName: Google Pixel 5
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: GooglePixel5_11_0
+  - deviceName: Google Pixel 3
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: GooglePixel3
+  - deviceName: Google Pixel 3a
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: GooglePixel3a
+  - deviceName: Google Pixel 4 XL
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: GooglePixel4XL
+  - deviceName: Google Pixel 4
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: GooglePixel4_11_0
+  - deviceName: Google Pixel 4
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: GooglePixel4_10_0
+  - deviceName: Google Pixel 6
+    browserName: chrome
+    osVersion: 12.0
+    playwrightConfigOptions:
+      name: GooglePixel6
+  - deviceName: Google Pixel 6 Pro
+    browserName: chrome
+    osVersion: 12.0
+    playwrightConfigOptions:
+      name: GooglePixel6Pro_12_0
+  - deviceName: Google Pixel 6 Pro
+    browserName: chrome
+    osVersion: 13.0
+    playwrightConfigOptions:
+      name: GooglePixel6Pro_13_0
+  - deviceName: Google Pixel 7
+    browserName: chrome
+    osVersion: 13.0
+    playwrightConfigOptions:
+      name: GooglePixel7
+  - deviceName: Google Pixel 8
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: GooglePixel8
+  - deviceName: Google Pixel 8 Pro
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: GooglePixel8Pro
+  - deviceName: Google Pixel 7 Pro
+    browserName: chrome
+    osVersion: 13.0
+    playwrightConfigOptions:
+      name: GooglePixel7Pro
+  - deviceName: Google Pixel 9
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: GooglePixel9
+  - deviceName: Google Pixel 9 Pro XL
+    browserName: chrome
+    osVersion: 14.0
+    playwrightConfigOptions:
+      name: GooglePixel9ProXL
+  - deviceName: OnePlus 7
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: OnePlus7
+  - deviceName: OnePlus 8
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: OnePlus8
+  - deviceName: OnePlus 9
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: OnePlus9
+  - deviceName: OnePlus 11R
+    browserName: chrome
+    osVersion: 13.0
+    playwrightConfigOptions:
+      name: OnePlus11R
+  - deviceName: OnePlus 7T
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: OnePlus7T
+  - deviceName: Motorola Moto G9 Play
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: MotorolaMotoG9Play
+  - deviceName: Motorola Moto G7 Play
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: MotorolaMotoG7Play
+  - deviceName: Motorola Moto G71 5G
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: MotorolaMotoG71
+  - deviceName: Vivo Y50
+    browserName: chrome
+    osVersion: 10.0
+    playwrightConfigOptions:
+      name: VivoY50
+  - deviceName: Vivo Y21
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: VivoY21
+  - deviceName: Vivo V21
+    browserName: chrome
+    osVersion: 11.0
+    playwrightConfigOptions:
+      name: VivoV21
+  - deviceName: Huawei P30
+    browserName: chrome
+    osVersion: 9.0
+    playwrightConfigOptions:
+      name: HuaweiP30
+  - os: Windows
+    osVersion: 11
+    browserName: chrome
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Windows11_Chrome
+  - os: Windows
+    osVersion: 11
+    browserName: edge
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Windows11_Edge
+  - os: Windows
+    osVersion: 11
+    browserName: playwright-webkit
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Windows11_Webkit
+  - os: OS X
+    osVersion: Ventura
+    browserName: chrome
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Ventura_Latest_Chrome
+  - os: OS X
+    osVersion: Ventura
+    browserName: edge
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Ventura_Latest_Edge
+  - os: OS X
+    osVersion: Ventura
+    browserName: playwright-webkit
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Ventura_Latest_Webkit
+  - os: OS X
+    osVersion: Monterey
+    browserName: chrome
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Monterey_Latest_Chrome
+  - os: OS X
+    osVersion: Monterey
+    browserName: edge
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Monterey_Latest_Edge
+  - os: OS X
+    osVersion: Monterey
+    browserName: playwright-webkit
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Monterey_Latest_Webkit
+  - os: OS X
+    osVersion: Big Sur
+    browserName: chrome
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: BigSur_Latest_Chrome
+  - os: OS X
+    osVersion: Big Sur
+    browserName: edge
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: BigSur_Latest_Edge
+  - os: OS X
+    osVersion: Big Sur
+    browserName: playwright-webkit
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: BigSur_Latest_Webkit
+  - os: OS X
+    osVersion: Catalina
+    browserName: chrome
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Catalina_Latest_Chrome
+  - os: OS X
+    osVersion: Catalina
+    browserName: edge
+    browserVersion: latest
+    playwrightConfigOptions:
+      name: Catalina_Latest_Edge
+
+
+
+# =======================
+# Parallels per Platform
+# =======================
+# The number of parallel threads to be used for each platform set.
+# BrowserStack's SDK runner will select the best strategy based on the configured value
+#
+# Example 1 - If you have configured 3 platforms and set `parallelsPerPlatform` as 2, a total of 6 (2 * 3) parallel threads will be used on BrowserStack
+#
+# Example 2 - If you have configured 1 platform and set `parallelsPerPlatform` as 5, a total of 5 (1 * 5) parallel threads will be used on BrowserStack
+parallelsPerPlatform: 1
+
+# ==========================================
+# BrowserStack Local
+# (For localhost, staging/private websites)
+# ==========================================
+# Set browserStackLocal to true if your website under test is not accessible publicly over the internet
+# Learn more about how BrowserStack Local works here -> https://www.browserstack.com/docs/automate/selenium/local-testing-introduction
+browserstackLocal: true # <boolean> (Default false)
+# browserStackLocalOptions:
+# Options to be passed to BrowserStack local in-case of advanced configurations
+  # localIdentifier: # <string> (Default: null) Needed if you need to run multiple instances of local.
+  # forceLocal: true  # <boolean> (Default: false) Set to true if you need to resolve all your traffic via BrowserStack Local tunnel.
+  # Entire list of arguments available here -> https://www.browserstack.com/docs/automate/selenium/manage-incoming-connections
+
+framework: playwright
+source: node-js-playwright-sample-sdk:v1
+
+# ===================
+# Debugging features
+# ===================
+debug: true # <boolean> # Set to true if you need screenshots for every selenium command ran
+networkLogs: true # <boolean> Set to true to enable HAR logs capturing
+consoleLogs: info # <string> Remote browser's console debug levels to be printed (Default: errors)
+# Available options are `disable`, `errors`, `warnings`, `info`, `verbose` (Default: errors)
+# CUSTOM_TAG_<INT>: # <string> (Default: parent folder name of the test file) Custom tag for your test suite
+
+# Test Observability is an intelligent test reporting & debugging product. It collects data using the SDK. Read more about what data is collected at https://www.browserstack.com/docs/test-observability/references/terms-and-conditions
+# Visit observability.browserstack.com to see your test reports and insights. To disable test observability, specify `testObservability: false` in the key below.
+testObservability: true
+browserstack.playwrightversion: 1.42.1
+client.playwrightversion: 1.42.1
+interactiveDebugging: true
+

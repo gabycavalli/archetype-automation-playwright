@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+# Check if BROWSERSTACK is set to true
+if [ "$BROWSERSTACK" = "true" ]; then
+    echo "Running Playwright tests on BrowserStack"
+    # Run Playwright tests on BrowserStack with options passed to docker
+    exec npx browserstack-node-sdk playwright test "$@"
+else
+    echo "Running Playwright tests locally"
+    # Run Playwright tests locally with options passed to docker
+    exec npx playwright test "$@"
+fi

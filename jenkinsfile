@@ -1,0 +1,384 @@
+pipeline {
+    agent {
+        label 'docker'
+    }
+
+    parameters {
+        choice(
+            name: 'ENV',
+            choices: ['qa', 'ppd'],
+            description: 'Run test on (qa or ppd).'
+        )
+        choice(
+            name: 'BRAND',
+            choices: ['bol', 'gc'],
+            description: 'Select the brand where the test will be executed.'
+        )
+        choice(
+            name: 'FLOW',
+            choices: ['Regresion', 'Login'],
+            description: 'Select the test flow to be executed.'
+        )
+        string(
+            name: 'TEST_NAME', 
+            description: 'Test case name to execute. Just need select ENV and BRAND. When this param is filled the FLOW parameter get disabled.'
+        )
+
+        choice(
+            name: 'iOS',
+            choices: [
+                '',
+                'iPhone14', 'iPhone15Plus', 'iPhone14Plus',
+                'iPhone11', 'iPhoneSE', 'iPhoneSE3',
+            ],
+            description: 'Local Playwright iOS devices. IMPORTANT: DO NOT SELECT THE BROWSERSTACK OPTION. IF NO DEVICE IS SELECTED THE EXECUTION WILL BE PERFORMED BY DEFAULT IN (CHRONIUM,FIREFOX and WEBKIT).'
+        )
+
+        booleanParam(
+            name: 'JIRA_TRACKING', defaultValue: false, description: 'Enable or disable test execution tracking in Jira'
+        )
+
+        booleanParam(
+            name: 'ALL',
+            defaultValue: true,
+            description: 'Run all Env-Brand combination (true/false). When is selected the ENV and BRAND parameters get disabled.'
+        )
+        booleanParam(
+            name: 'BROWSERSTACK',
+            defaultValue: false,
+            description: 'Execute on Browserstack. IMPORTANT: SELECT 1 KIND OF DEVICE BELOW THIS OPTION.'
+        )
+        choice(
+            name: 'ANDROID',
+            choices: [
+                '', 
+                'SamsungGalaxyNote20', 'SamsungGalaxyS8', 'SamsungGalaxyS9', 'SamsungGalaxyNote9', 
+                'SamsungGalaxyA10', 'SamsungGalaxyA51', 'SamsungGalaxyA52', 'SamsungGalaxyA11', 
+                'SamsungGalaxyM32', 'SamsungGalaxyS20', 'SamsungGalaxyS10', 'SamsungGalaxyS20Plus', 
+                'SamsungGalaxyS20Ultra', 'SamsungGalaxyS21', 'SamsungGalaxyS21_12_0', 
+                'SamsungGalaxyS21Plus', 'SamsungGalaxyS21Ultra', 'SamsungGalaxyS22', 
+                'SamsungGalaxyS23Ultra', 'SamsungGalaxyNote10', 'SamsungGalaxyM52', 
+                'SamsungGalaxyNote20Ultra', 'SamsungGalaxyS24', 'SamsungGalaxyS24Ultra', 
+                'GooglePixel5_12_0', 'GooglePixel5_11_0', 'GooglePixel3', 'GooglePixel3a', 
+                'GooglePixel4XL', 'GooglePixel4_11_0', 'GooglePixel4_10_0', 'GooglePixel6', 
+                'GooglePixel6Pro_12_0', 'GooglePixel6Pro_13_0', 'GooglePixel7', 'GooglePixel8', 
+                'GooglePixel8Pro', 'GooglePixel7Pro', 'GooglePixel9', 'GooglePixel9ProXL', 
+                'OnePlus7', 'OnePlus8', 'OnePlus9', 'OnePlus11R', 'OnePlus7T', 'MotorolaMotoG9Play', 
+                'MotorolaMotoG7Play', 'MotorolaMotoG71', 'VivoY50', 'VivoY21', 'VivoV21', 'HuaweiP30'
+            ],
+            description: 'Browserstack Android devices.'
+        )
+        choice(
+            name: 'OSX',
+            choices: [
+                '',
+                'Ventura_Latest_Chrome', 'Ventura_Latest_Edge', 'Ventura_Latest_Webkit',
+                'Monterey_Latest_Chrome', 'Monterey_Latest_Edge', 'Monterey_Latest_Webkit',
+                'BigSur_Latest_Chrome', 'BigSur_Latest_Edge', 'BigSur_Latest_Webkit',
+                'Catalina_Latest_Chrome', 'Catalina_Latest_Edge',
+            ],
+            description: 'Browserstack OS X devices.'
+        )
+        choice(
+            name: 'WINDOWS',
+            choices: ['','Windows11_Chrome', 'Windows11_Edge', 'Windows11_Webkit'],
+            description: 'Browserstack Windows devices.'
+        )
+    }
+
+    environment {
+        CI = true
+        IMAGE_NAME = 'playwright-e2e'
+    }
+
+    options {
+        disableConcurrentBuilds()
+        skipStagesAfterUnstable()
+        timeout(time: 120, unit: 'MINUTES')
+        parallelsAlwaysFailFast()
+    }
+
+    /* triggers {
+        cron('0 10 * * *')
+    } */
+
+    stages {
+        stage('Build Playwright Image') {
+            steps {
+                echo 'Building Playwright Image...'
+                script {
+                    def DEVICE = ''
+                    // Validación de múltiples dispositivos
+                    def selectedDevices = [params.ANDROID, params.OSX, params.WINDOWS].findAll { it != null && it != '' }.size()
+                    if (selectedDevices != 1 && env.BROWSERSTACK == 'true') {
+                        echo "+---------------------------------------------------------------------------------------------------------+"
+                        echo "| Multiple or 0 devices selected with BROWSERSTACK enabled.                                               |"
+                        echo "| Please select only 1 type of device (Android, OSX, or Windows) and ensure BROWSERSTACK is set to true.  |"
+                        echo "| You selected: ${selectedDevices} devices and BROWSERSTACK is ${env.BROWSERSTACK}.                       |"
+                        echo "+---------------------------------------------------------------------------------------------------------+"
+                        error "Invalid configuration: Multiple devices or 0 devices selected with BROWSERSTACK enabled."
+                    } else {
+                        if (params.ANDROID) {
+                            DEVICE = params.ANDROID
+                        } else if (params.OSX) {
+                            DEVICE = params.OSX
+                        } else if (params.WINDOWS) {
+                            DEVICE = params.WINDOWS
+                        }
+                        echo "Selected device: ${DEVICE}"
+                    }
+
+                    if (params.ALL) {
+                        if(params.BROWSERSTACK){
+                            currentBuild.displayName = "Build#${currentBuild.number} - Env=All - Scenario=${FLOW} - Browserstack=ON - JiraTracking=${JIRA_TRACKING} - Device=${DEVICE}"
+                        }else{
+                            if(params.iOS){
+                                currentBuild.displayName = "Build#${currentBuild.number} - Env=All - Scenario=${FLOW} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING} - Device=${iOS}"
+                            }else{
+                                currentBuild.displayName = "Build#${currentBuild.number} - Env=All - Scenario=${FLOW} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING}"
+                            }
+                        }
+                    } else {
+                        if (!params.TEST_NAME) {
+                            if(params.BROWSERSTACK){
+                                currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${FLOW} - Browserstack=ON - JiraTracking=${JIRA_TRACKING} - Device=${DEVICE}"
+                            }else{
+                                if(params.iOS){
+                                    currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${FLOW} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING} - Device=${iOS}"    
+                                }else{
+                                    currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${FLOW} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING}"
+                                }
+                            }
+                        } else {
+                            if(params.BROWSERSTACK){
+                                currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${TEST_NAME} - Browserstack=ON - JiraTracking=${JIRA_TRACKING} - Device=${DEVICE}"
+                            }else{
+                                if(params.iOS){
+                                    currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${TEST_NAME} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING} - Device=${iOS}"                                            
+                                }else{
+                                    currentBuild.displayName = "Build#${currentBuild.number} - Env=${ENV} - BRAND=${BRAND} - Scenario=${TEST_NAME} - Browserstack=OFF - JiraTracking=${JIRA_TRACKING}"
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+                
+                sh "docker build -t ${IMAGE_NAME} ."
+            }
+        }
+
+        stage('Run Playwright Tests') {
+            steps {
+                script {
+                    try {
+                        sh "echo ENV: ${ENV}"
+                        sh "echo BRAND: ${BRAND}"
+                        def SCENARIO = ''
+                        if (!params.TEST_NAME) {
+                            sh "echo FLOW: ${FLOW}"
+                            SCENARIO = params.FLOW
+                        } else {
+                            sh "echo TEST_NAME: ${TEST_NAME}"
+                            SCENARIO = params.TEST_NAME
+                        }
+
+                        if (params.ALL) {
+                            env.ALL = 'true'
+                        } else {
+                            env.ALL = 'false'
+                        }
+
+                        if (params.BROWSERSTACK) {
+                            env.BROWSERSTACK = 'true'
+                            sh "echo ANDROID: ${params.ANDROID}, OSX: ${params.OSX}, WINDOWS: ${params.WINDOWS}"
+                        } else {
+                            env.BROWSERSTACK = 'false'
+                        }
+                        
+                        sh "echo ALL: ${ALL}"
+                        sh "echo BROWSERSTACK: ${BROWSERSTACK}"
+                        sh "echo JIRA_TRACKING: ${JIRA_TRACKING}"
+
+                        def DEVICE = ''
+                        def selectedDevices = [params.ANDROID, params.OSX, params.WINDOWS].findAll { it != null && it != '' }.size()
+                        if (selectedDevices != 1 && env.BROWSERSTACK == 'true') {
+                            echo "+---------------------------------------------------------------------------------------------------------+"
+                            echo "| Multiple or 0 devices selected with BROWSERSTACK enabled.                                               |"
+                            echo "| Please select only 1 type of device (Android, OSX, or Windows) and ensure BROWSERSTACK is set to true.  |"
+                            echo "| You selected: ${selectedDevices} devices and BROWSERSTACK is ${env.BROWSERSTACK}.                       |"
+                            echo "+---------------------------------------------------------------------------------------------------------+"
+                            error "Invalid configuration: Multiple devices or 0 devices selected with BROWSERSTACK enabled."
+                        } else {
+                            if (params.ANDROID) {
+                                DEVICE = params.ANDROID
+                            } else if (params.OSX) {
+                                DEVICE = params.OSX
+                            } else if (params.WINDOWS) {
+                                DEVICE = params.WINDOWS
+                            }
+                            echo "Selected device: ${DEVICE}"
+                        }
+
+
+
+                        if (env.BROWSERSTACK == 'true') {
+                            withCredentials([string(credentialsId: 'c93ad82b-bccb-4707-aa29-c42132f24f5c', variable: 'new_relic_automation_secret'), usernamePassword(credentialsId: 'svc.qa.auto.maverick', usernameVariable: 'JIRA_USERNAME', passwordVariable: 'JIRA_PASSWORD')]){ 
+                                sh """
+                                docker run --rm \
+                                -v `pwd`/playwright:/tests/playwright \
+                                -v `pwd`/playwright-report:/tests/playwright-report \
+                                -e ENV=${ENV} \
+                                -e BRAND=${BRAND} \
+                                -e ALL=${ALL} \
+                                -e BUILD_NUMBER=${BUILD_NUMBER} \
+                                -e PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+                                -e BROWSERSTACK=${env.BROWSERSTACK} \
+                                -e JIRA_TRACKING=${JIRA_TRACKING} \
+                                -e JIRA_USERNAME=${JIRA_USERNAME} \
+                                -e JIRA_PASSWORD=${JIRA_PASSWORD} \
+                                -e JIRA_SERVER="https://jira.itspty.com" \
+                                -e JIRA_PROJECT_ID="16901" \
+                                ${IMAGE_NAME} \
+                                --config=./playwright.config.js --project=${DEVICE} --grep '${SCENARIO}'
+                                """
+                            }
+                        } else {
+                            if (params.iOS) {
+                                withCredentials([string(credentialsId: 'c93ad82b-bccb-4707-aa29-c42132f24f5c', variable: 'new_relic_automation_secret'), usernamePassword(credentialsId: 'svc.qa.auto.maverick', usernameVariable: 'JIRA_USERNAME', passwordVariable: 'JIRA_PASSWORD')]){ 
+                                    sh """
+                                    docker run --rm \
+                                    -v `pwd`/playwright:/tests/playwright \
+                                    -v `pwd`/playwright-report:/tests/playwright-report \
+                                    -e ENV=${ENV} \
+                                    -e BRAND=${BRAND} \
+                                    -e ALL=${ALL} \
+                                    -e BUILD_NUMBER=${BUILD_NUMBER} \
+                                    -e PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+                                    -e BROWSERSTACK=${env.BROWSERSTACK} \
+                                    -e JIRA_TRACKING=${JIRA_TRACKING} \
+                                    -e JIRA_USERNAME=${JIRA_USERNAME} \
+                                    -e JIRA_PASSWORD=${JIRA_PASSWORD} \
+                                    -e JIRA_SERVER="https://jira.itspty.com" \
+                                    -e JIRA_PROJECT_ID="16901" \
+                                    ${IMAGE_NAME} \
+                                    --project=${iOS} --workers=1 --grep '${SCENARIO}'
+                                    """
+                                }
+                            }else{
+                                withCredentials([string(credentialsId: 'c93ad82b-bccb-4707-aa29-c42132f24f5c', variable: 'new_relic_automation_secret'), usernamePassword(credentialsId: 'svc.qa.auto.maverick', usernameVariable: 'JIRA_USERNAME', passwordVariable: 'JIRA_PASSWORD')]){ 
+                                    sh """
+                                    docker run --rm \
+                                    -v `pwd`/playwright:/tests/playwright \
+                                    -v `pwd`/playwright-report:/tests/playwright-report \
+                                    -e ENV=${ENV} \
+                                    -e BRAND=${BRAND} \
+                                    -e ALL=${ALL} \
+                                    -e BUILD_NUMBER=${BUILD_NUMBER} \
+                                    -e PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+                                    -e BROWSERSTACK=${env.BROWSERSTACK} \
+                                    -e JIRA_TRACKING=${JIRA_TRACKING} \
+                                    -e JIRA_USERNAME=${JIRA_USERNAME} \
+                                    -e JIRA_PASSWORD=${JIRA_PASSWORD} \
+                                    -e JIRA_SERVER="https://jira.itspty.com" \
+                                    -e JIRA_PROJECT_ID="16901" \
+                                    ${IMAGE_NAME} \
+                                    --project=chromium --project=firefox --project=webkit --workers=1 --grep '${SCENARIO}'
+                                    """
+                                }
+
+                            }
+                            
+                        }
+
+                    } catch (e) {
+                        echo "Error: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+
+
+        stage('Publish Playwright Report') {
+            steps {
+                script {
+                    publishHTML (target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: "Playwright Test Report"
+                    ])
+                }
+            }
+        }
+
+        /* stage('Notification mattermost') {
+            steps {
+                script {
+                    def message, color
+                    def baseMessage = ""
+
+                    if (params.ALL) {
+                        if (params.BROWSERSTACK) {
+                            baseMessage = "Env=All\nScenario=${FLOW}\nBrowserstack=ON\nJiraTracking=${JIRA_TRACKING}\nDevice=${DEVICE}"
+                        } else {
+                            if (params.iOS) {
+                                baseMessage = "Env=All\nScenario=${FLOW}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}\nDevice=${iOS}"
+                            } else {
+                                baseMessage = "Env=All\nScenario=${FLOW}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}"
+                            }
+                        }
+                    } else {
+                        if (!params.TEST_NAME) {
+                            if (params.BROWSERSTACK) {
+                                baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${FLOW}\nBrowserstack=ON\nJiraTracking=${JIRA_TRACKING}\nDevice=${DEVICE}"
+                            } else {
+                                if (params.iOS) {
+                                    baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${FLOW}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}\nDevice=${iOS}"
+                                } else {
+                                    baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${FLOW}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}"
+                                }
+                            }
+                        } else {
+                            if (params.BROWSERSTACK) {
+                                baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${TEST_NAME}\nBrowserstack=ON\nJiraTracking=${JIRA_TRACKING}\nDevice=${DEVICE}"
+                            } else {
+                                if (params.iOS) {
+                                    baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${TEST_NAME}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}\nDevice=${iOS}"
+                                } else {
+                                    baseMessage = "Env=${ENV}\nBRAND=${BRAND}\nScenario=${TEST_NAME}\nBrowserstack=OFF\nJiraTracking=${JIRA_TRACKING}"
+                                }
+                            }
+                        }
+                    }
+
+                    if (currentBuild.result == 'FAILURE') {
+                        color = '#e00707'
+                        message = "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n\r${baseMessage}\n\r(<${env.BUILD_URL}|Build> - <${env.BUILD_URL}Playwright_20Test_20Report/|Report>) :x:"
+                    } else {
+                        color = '#00f514'
+                        message = "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n\r${baseMessage}\n\r(<${env.BUILD_URL}|Build> - <${env.BUILD_URL}Playwright_20Test_20Report/|Report>) :white_check_mark:"
+                    }
+
+                    mattermostSend(
+                        color: color,
+                        icon: 'https://i.postimg.cc/cH5cjP1d/Testcafe.png',
+                        channel: 'testautomation-pam-maverick',
+                        endpoint: 'https://mattermost.itspty.com/hooks/zt7jhcxm6bdjuxnzjeapwcs5dy',
+                        message: message
+                    )
+                }
+            }
+        } */
+
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

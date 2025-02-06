@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "site": {
+      "name": "site name",
+      "siteUrl": "https://xxxxxxxxxxxxxxxxx/",
+      "domain": "xxxxxxxx",
+      "user": "xxxxxxxxxxxxxxxxx",
+      "password": "xxxxxxxxxxxxxxxxx",
+      "add more data": "add more data"
+    }
+  }
+}
